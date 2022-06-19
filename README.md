@@ -10,3 +10,7 @@ Steps performed:
 3. Updated detections
 4. Enjoy
 
+Steps to install:
+1. Git clone
+2. npm i
+3. npm start

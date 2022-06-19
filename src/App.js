@@ -1,13 +1,4 @@
-// 1. Install dependencies DONE
-// 2. Import dependencies DONE
-// 3. Setup webcam and canvas DONE
-// 4. Define references to those DONE
-// 5. Load handpose DONE
-// 6. Detect function DONE
-// 7. Drawing utilities DONE
-// 8. Draw functions DONE
-
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 // import logo from './logo.svg';
 import * as tf from "@tensorflow/tfjs";
 import * as handpose from "@tensorflow-models/handpose";
@@ -15,9 +6,15 @@ import Webcam from "react-webcam";
 import "./App.css";
 import { drawHand } from "./utilities";
 
+import * as fp from 'fingerpose';
+import thumbsup from './thumbsup.png';
+import victory from './victory.png';
+
 function App() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+
+  const [emoji, setEmoji] = useState(null)
 
   const runHandpose = async () => {
     const net = await handpose.load();
@@ -50,7 +47,20 @@ function App() {
 
       // Make Detections
       const hand = await net.estimateHands(video);
-      console.log(hand);
+
+      if (hand.length > 0) {
+        const GE = new fp.GestureEstimator([
+          fp.Gestures.VictoryGesture,
+          fp.Gestures.ThumbsUpGesture,
+        ])
+        const gesture = await GE.estimate(hand[0].landmarks, 8);
+        if (gesture.gestures !== undefined && gesture.gestures.length > 0) {
+          const confidence = gesture.gestures.map((prediction) => prediction.score);
+          const maxConfidence = confidence.indexOf(Math.max.apply(null, confidence));
+          setEmoji(gesture.gestures[maxConfidence].name);
+          console.log(emoji);
+        }
+      }
 
       // Draw mesh
       const ctx = canvasRef.current.getContext("2d");

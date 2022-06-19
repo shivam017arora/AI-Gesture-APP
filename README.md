@@ -11,6 +11,6 @@ Steps performed:
 4. Enjoy
 
 Steps to install:
-1. Git clone
+1. git clone
 2. npm i
 3. npm start
